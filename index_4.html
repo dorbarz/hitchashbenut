@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F1319">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="התחשבנות">
+<title>התחשבנות</title>
+<style>
+  :root{
+    --bg:#0F1319; --card:#171D26; --card2:#1E2632; --line:#2A3341;
+    --ink:#EAEEF4; --mut:#8B95A5; --amber:#F2B24C; --amber-ink:#1A1408;
+    --green:#5FCF87; --red:#E0685E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Heebo",Arial,sans-serif; font-size:16px}
+  body{padding:14px 14px 120px; max-width:560px; margin:0 auto}
+  h1{font-size:22px; font-weight:800; margin:6px 0 2px}
+  .sub{color:var(--mut); font-size:13px; margin:0 0 18px}
+  .sec{margin:0 0 22px}
+  .sec-head{display:flex; align-items:baseline; justify-content:space-between; margin:0 0 10px}
+  .sec-title{font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--mut)}
+  .linkbtn{background:none; border:none; color:var(--amber); font-size:13px; font-weight:600; padding:4px 6px; cursor:pointer; border-radius:8px}
+  .linkbtn:focus-visible{outline:2px solid var(--amber)}
+  /* chips */
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{border:1.5px solid var(--line); background:var(--card); color:var(--mut);
+    border-radius:999px; padding:9px 16px; font-size:15px; font-weight:600; cursor:pointer; position:relative}
+  .chip.on{background:var(--amber); border-color:var(--amber); color:var(--amber-ink)}
+  .chip.guest{border-style:dashed}
+  .chip .rm{margin-inline-start:8px; font-weight:800; color:var(--red)}
+  .chip:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+  .addrow{display:flex; gap:8px; margin-top:12px}
+  .addrow input{flex:1; min-width:0}
+  input,select{background:var(--card2); border:1.5px solid var(--line); color:var(--ink);
+    border-radius:12px; padding:11px 12px; font-size:16px; font-family:inherit}
+  input:focus,select:focus{outline:none; border-color:var(--amber)}
+  input::placeholder{color:#5A6474}
+  .btn{border:none; border-radius:12px; padding:11px 16px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit}
+  .btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px}
+  .btn-amber{background:var(--amber); color:var(--amber-ink)}
+  .btn-ghost{background:var(--card2); color:var(--ink); border:1.5px solid var(--line)}
+  .btn-wide{width:100%; padding:14px; font-size:16px}
+  /* expense card */
+  .exp{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px}
+  .exp-top{display:flex; gap:8px; align-items:center}
+  .exp-top select{flex:1.2; min-width:0}
+  .amt{width:96px; text-align:center; font-weight:800; font-size:18px; font-variant-numeric:tabular-nums}
+  .desc{width:100%; margin-top:8px}
+  .exp-foot{display:flex; justify-content:space-between; align-items:center; margin-top:10px}
+  .who{font-size:13px; color:var(--mut); background:none; border:none; padding:4px 0; cursor:pointer; font-family:inherit; text-align:start}
+  .who b{color:var(--amber); font-weight:700}
+  .del{background:none; border:none; color:#5A6474; font-size:20px; padding:4px 8px; cursor:pointer; border-radius:8px}
+  .del:focus-visible,.who:focus-visible{outline:2px solid var(--amber)}
+  .parts{display:none; flex-wrap:wrap; gap:7px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line)}
+  .parts.open{display:flex}
+  .pchip{border:1.5px solid var(--line); background:var(--card2); color:var(--ink);
+    border-radius:999px; padding:7px 13px; font-size:14px; font-weight:600; cursor:pointer}
+  .pchip.out{color:#5A6474; text-decoration:line-through; text-decoration-color:var(--red); text-decoration-thickness:2px; background:transparent}
+  /* results */
+  .res{background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:16px}
+  .res-total{display:flex; justify-content:space-between; font-size:14px; color:var(--mut); margin-bottom:12px}
+  .res-total b{color:var(--ink); font-size:16px; font-variant-numeric:tabular-nums}
+  .tr{display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-top:1px solid var(--line); font-size:16px}
+  .tr .amt2{font-weight:800; color:var(--green); font-variant-numeric:tabular-nums; font-size:18px}
+  .tr .arrow{color:var(--mut); margin:0 8px}
+  .zero{color:var(--mut); font-size:14px; padding:8px 0}
+  .empty{color:#5A6474; font-size:14px; padding:14px; text-align:center; border:1.5px dashed var(--line); border-radius:14px}
+  .toast{position:fixed; bottom:88px; right:50%; transform:translateX(50%); background:var(--ink); color:var(--bg);
+    padding:10px 18px; border-radius:999px; font-weight:700; font-size:14px; opacity:0; pointer-events:none; transition:opacity .2s}
+  .toast.show{opacity:1}
+  .bar{position:fixed; bottom:0; right:0; left:0; padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(transparent, var(--bg) 30%); display:flex; gap:10px; max-width:560px; margin:0 auto}
+  .bar .btn{flex:1}
+  @media (prefers-reduced-motion:reduce){ .toast{transition:none} }
+</style>
+</head>
+<body>
+
+<h1>התחשבנות 🧾</h1>
+<p class="sub" id="dateline"></p>
+
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-title">מי פה הערב</span>
+    <button class="linkbtn" id="editBtn">ערוך רשימה</button>
+  </div>
+  <div class="chips" id="people"></div>
+  <div class="addrow">
+    <input id="newName" placeholder="שם..." enterkeyhint="done" autocomplete="off">
+    <button class="btn btn-ghost" id="addFixed">קבוע</button>
+    <button class="btn btn-ghost" id="addGuest">אורח</button>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head">
+    <span class="sec-title">מי שילם על מה</span>
+  </div>
+  <div id="expList"></div>
+  <button class="btn btn-ghost btn-wide" id="addExp">+ הוסף הוצאה</button>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-title">מי מעביר למי</span></div>
+  <div id="results"></div>
+</div>
+
+<div class="bar">
+  <button class="btn btn-ghost" id="resetBtn">ערב חדש</button>
+  <button class="btn btn-amber" id="copyBtn">📋 העתק לקבוצה</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const KEY='brz-split-v1';
+let S={friends:[], present:[], guests:[], expenses:[]};
+let edit=false, seq=1;
+const hasWS = !!(window.storage && typeof window.storage.get==='function');
+
+/* ---------- storage: בתוך קלוד או עצמאי ---------- */
+async function load(){
+  try{
+    let raw=null;
+    if(hasWS){ const r=await window.storage.get(KEY); raw=r&&r.value; }
+    else raw=localStorage.getItem(KEY);
+    if(raw){ const d=JSON.parse(raw);
+      S.friends=d.friends||[]; S.present=d.present||[]; S.guests=d.guests||[]; S.expenses=d.expenses||[];
+      seq=(d.seq||S.expenses.length)+1; }
+  }catch(e){ /* מפתח לא קיים / אין אחסון */ }
+  render();
+}
+let t=null;
+function save(){
+  clearTimeout(t); t=setTimeout(async()=>{
+    const s=JSON.stringify({...S,seq});
+    try{ if(hasWS) await window.storage.set(KEY,s); else localStorage.setItem(KEY,s); }catch(e){}
+  },300);
+}
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const all=()=>[...S.friends,...S.guests];
+const isOn=n=>S.present.includes(n);
+const fmt=n=>{ const v=Math.round(n*100)/100; return (v%1?v.toFixed(2):String(v)); };
+function toast(m){ const el=$('toast'); el.textContent=m; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1800); }
+
+/* ---------- people ---------- */
+function addPerson(guest){
+  const n=$('newName').value.trim();
+  if(!n) return;
+  if(all().includes(n)){ toast('השם כבר קיים'); return; }
+  (guest?S.guests:S.friends).push(n);
+  S.present.push(n);
+  $('newName').value='';
+  save(); render();
+}
+function togglePresent(n){
+  const i=S.present.indexOf(n);
+  if(i>=0) S.present.splice(i,1); else S.present.push(n);
+  save(); render();
+}
+function removePerson(n){
+  S.friends=S.friends.filter(x=>x!==n);
+  S.guests=S.guests.filter(x=>x!==n);
+  S.present=S.present.filter(x=>x!==n);
+  S.expenses.forEach(e=>{ if(e.payer===n)e.payer=''; e.excl=e.excl.filter(x=>x!==n); });
+  save(); render();
+}
+
+/* ---------- expenses ---------- */
+function addExp(){
+  S.expenses.push({id:seq++, payer:'', amount:'', desc:'', excl:[], open:false});
+  save(); render();
+  const el=document.querySelector('.exp:last-of-type select'); if(el) el.focus();
+}
+function exp(id){ return S.expenses.find(e=>e.id===id); }
+function participants(e){ return S.present.filter(n=>!e.excl.includes(n)); }
+
+/* ---------- calc ---------- */
+function calc(){
+  const bal={}; all().forEach(n=>bal[n]=0);
+  let total=0, valid=0;
+  for(const e of S.expenses){
+    const a=parseFloat(e.amount);
+    const p=participants(e);
+    if(!e.payer||!(a>0)||!p.length) continue;
+    valid++; total+=a;
+    bal[e.payer]=(bal[e.payer]||0)+a;
+    const share=a/p.length;
+    p.forEach(n=>bal[n]-=share);
+  }
+  // עיגול לשקל שלם, השארית נבלעת אצל הזכאי הגדול
+  const r={}; let drift=0;
+  for(const n in bal){ r[n]=Math.round(bal[n]); drift+=r[n]; }
+  if(drift!==0){
+    const top=Object.keys(r).sort((a,b)=>r[b]-r[a])[0];
+    r[top]-=drift;
+  }
+  // קיזוז חמדני
+  const debt=Object.entries(r).filter(([,v])=>v<0).map(([n,v])=>({n,v:-v})).sort((a,b)=>b.v-a.v);
+  const cred=Object.entries(r).filter(([,v])=>v>0).map(([n,v])=>({n,v})).sort((a,b)=>b.v-a.v);
+  const trs=[];
+  let i=0,j=0;
+  while(i<debt.length&&j<cred.length){
+    const x=Math.min(debt[i].v,cred[j].v);
+    if(x>0) trs.push({from:debt[i].n,to:cred[j].n,amt:x});
+    debt[i].v-=x; cred[j].v-=x;
+    if(debt[i].v===0)i++; if(cred[j].v===0)j++;
+  }
+  return {trs,total,valid};
+}
+
+/* ---------- render ---------- */
+function render(){
+  $('dateline').textContent=new Date().toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'});
+  $('editBtn').textContent=edit?'סיום עריכה':'ערוך רשימה';
+
+  // chips
+  const pc=$('people'); pc.innerHTML='';
+  if(!all().length) pc.innerHTML='<div class="empty">הוסיפו את החברים הקבועים למטה — נשמרים לפעם הבאה</div>';
+  all().forEach(n=>{
+    const b=document.createElement('button');
+    b.className='chip'+(isOn(n)?' on':'')+(S.guests.includes(n)?' guest':'');
+    b.innerHTML=esc(n)+(edit?'<span class="rm">✕</span>':'');
+    b.onclick=()=> edit?removePerson(n):togglePresent(n);
+    pc.appendChild(b);
+  });
+
+  // expenses
+  const L=$('expList'); L.innerHTML='';
+  if(!S.expenses.length) L.innerHTML='<div class="empty" style="margin-bottom:12px">עוד אין הוצאות — כל שורה: מי שילם, כמה, ועל מה</div>';
+  S.expenses.forEach(e=>{
+    const d=document.createElement('div'); d.className='exp';
+    const opts=['<option value="">מי שילם?</option>']
+      .concat(all().map(n=>`<option ${e.payer===n?'selected':''}>${esc(n)}</option>`)).join('');
+    const p=participants(e);
+    const whoTxt = e.excl.length
+      ? `בלי <b>${esc(e.excl.join(', '))}</b> · ${p.length} משתתפים`
+      : `מתחלק בין <b>כולם</b> (${p.length})`;
+    d.innerHTML=`
+      <div class="exp-top">
+        <select data-f="payer">${opts}</select>
+        <input class="amt" data-f="amount" inputmode="decimal" placeholder="₪" value="${esc(String(e.amount))}">
+      </div>
+      <input class="desc" data-f="desc" placeholder="על מה? (וולט, קיוסק, אלכוהול...)" value="${esc(e.desc)}">
+      <div class="exp-foot">
+        <button class="who">${whoTxt} ▾</button>
+        <button class="del" aria-label="מחק הוצאה">✕</button>
+      </div>
+      <div class="parts${e.open?' open':''}"></div>`;
+    d.querySelector('[data-f=payer]').onchange=ev=>{ e.payer=ev.target.value; save(); render(); };
+    d.querySelector('[data-f=amount]').oninput=ev=>{ e.amount=ev.target.value.replace(',','.'); save(); renderResults(); };
+    d.querySelector('[data-f=desc]').oninput=ev=>{ e.desc=ev.target.value; save(); };
+    d.querySelector('.who').onclick=()=>{ e.open=!e.open; render(); };
+    d.querySelector('.del').onclick=()=>{ S.expenses=S.expenses.filter(x=>x.id!==e.id); save(); render(); };
+    const pw=d.querySelector('.parts');
+    S.present.forEach(n=>{
+      const c=document.createElement('button');
+      const out=e.excl.includes(n);
+      c.className='pchip'+(out?' out':'');
+      c.textContent=n;
+      c.onclick=()=>{ out?e.excl=e.excl.filter(x=>x!==n):e.excl.push(n); save(); render(); };
+      pw.appendChild(c);
+    });
+    L.appendChild(d);
+  });
+
+  renderResults();
+}
+
+function renderResults(){
+  const {trs,total,valid}=calc();
+  const R=$('results');
+  if(!valid){ R.innerHTML='<div class="empty">ההעברות יופיעו פה אוטומטית</div>'; return; }
+  let h=`<div class="res"><div class="res-total"><span>סה"כ הערב · ${valid} הוצאות</span><b>${fmt(total)} ₪</b></div>`;
+  if(!trs.length) h+='<div class="zero">מאוזן — אין העברות 🎉</div>';
+  trs.forEach(t=>{ h+=`<div class="tr"><span>${esc(t.from)} <span class="arrow">←</span> ${esc(t.to)}</span><span class="amt2">${t.amt} ₪</span></div>`; });
+  h+='</div>';
+  R.innerHTML=h;
+}
+
+/* ---------- copy & reset ---------- */
+function buildText(){
+  const {trs,total,valid}=calc();
+  if(!valid) return '';
+  const d=new Date().toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});
+  let s=`💰 התחשבנות ${d} · סה"כ ${fmt(total)} ₪ · ${S.present.length} משתתפים\n\n`;
+  if(trs.length){ trs.forEach(t=>s+=`${t.from} מעביר ל${t.to}: ${t.amt} ₪\n`); }
+  else s+='מאוזן — אין העברות\n';
+  s+='\n📋 פירוט:\n';
+  S.expenses.forEach(e=>{
+    const a=parseFloat(e.amount);
+    if(!e.payer||!(a>0)) return;
+    s+=`• ${e.payer} — ${e.desc||'הוצאה'} — ${fmt(a)} ₪`;
+    if(e.excl.length) s+=` (בלי ${e.excl.join(', ')})`;
+    s+='\n';
+  });
+  return s;
+}
+$('copyBtn').onclick=async()=>{
+  const s=buildText();
+  if(!s){ toast('אין עוד מה להעתיק'); return; }
+  try{ await navigator.clipboard.writeText(s); toast('הועתק! הדבק בקבוצה'); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=s; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast('הועתק! הדבק בקבוצה');
+  }
+};
+let armed=false;
+$('resetBtn').onclick=()=>{
+  if(!armed){ armed=true; $('resetBtn').textContent='בטוח? הקש שוב'; setTimeout(()=>{armed=false; $('resetBtn').textContent='ערב חדש';},2500); return; }
+  armed=false; $('resetBtn').textContent='ערב חדש';
+  S.expenses=[]; S.guests=S.guests.filter(g=>false); S.present=[...S.friends];
+  save(); render(); toast('ערב חדש — הרשימה הקבועה נשמרה');
+};
+
+$('editBtn').onclick=()=>{ edit=!edit; render(); };
+$('addFixed').onclick=()=>addPerson(false);
+$('addGuest').onclick=()=>addPerson(true);
+$('newName').addEventListener('keydown',e=>{ if(e.key==='Enter') addPerson(false); });
+$('addExp').onclick=addExp;
+
+load();
+})();
+</script>
+</body>
+</html>
